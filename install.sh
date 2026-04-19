@@ -97,11 +97,23 @@ export PATH="$HOME/.local/bin:$PATH"
 # Do NOT set PROTON_PASS_SESSION_DIR — overriding it changes where pass-cli
 # looks for session files and can cause "Passphrases file not found" even
 # after a successful login.
+#
+# Use the env key provider so the session is encrypted with a key derived from
+# the PAT rather than the system keyring. The keyring (default provider) can
+# cause "Error decrypting local session" on machines where D-Bus is available
+# during login but not accessible to the immediately following vault-read
+# command (common in SSH sessions on machines with gnome-keyring installed).
+# The env provider is safe here: this session is ephemeral — setup.sh replaces
+# it immediately with an interactive fs-provider login.
+export PROTON_PASS_KEY_PROVIDER=env
+export PROTON_PASS_ENCRYPTION_KEY="$PROTON_PAT"
 pass-cli logout --force 2>/dev/null || true
 rm -rf "$HOME/.local/share/proton-pass-cli"
 pass-cli login --pat "$PROTON_PAT"
 
 unset PROTON_PAT
+unset PROTON_PASS_ENCRYPTION_KEY
+unset PROTON_PASS_KEY_PROVIDER
 
 # ── Read GitHub PAT from the 'tokens' vault, authenticate gh ──────────────────
 
