@@ -5,11 +5,11 @@
 # Safe to re-run.
 #
 # Usage:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/<user>/bootstrap/master/install.sh)
-#   bash install.sh --repo <user>/<repo> --branch master
+#   bash <(curl -fsSL https://raw.githubusercontent.com/tim-atkinson/bootstrap/master/install.sh)
+#   bash install.sh [--repo rybbt/dotfiles] [--branch master]
 #
 # Flags / environment variables:
-#   --repo / BOOTSTRAP_REPO        e.g. <user>/<repo>
+#   --repo / BOOTSTRAP_REPO        e.g. org/repo (default: rybbt/dotfiles)
 #   --branch / BOOTSTRAP_BRANCH    e.g. master (default: master)
 #   --proton-pat <value>           Proton Pass PAT (pst_xxxx::TOKENKEY) —
 #                                  scoped read on the 'ssh' and 'tokens'
@@ -25,7 +25,7 @@ set -euo pipefail
 
 # ── Args ──────────────────────────────────────────────────────────────────────
 
-REPO="${BOOTSTRAP_REPO:-}"
+REPO="${BOOTSTRAP_REPO:-rybbt/dotfiles}"
 PROTON_PAT=""
 BRANCH_SET=false
 BRANCH="master"
@@ -46,10 +46,6 @@ while [[ $# -gt 0 ]]; do
 done
 
 # ── Prompts ───────────────────────────────────────────────────────────────────
-
-if [[ -z "$REPO" ]]; then
-  read -rp "Target repo (org/repo): " REPO
-fi
 
 if [[ "$BRANCH_SET" == false ]]; then
   read -rp "Branch [$BRANCH]: " _branch
@@ -81,8 +77,8 @@ fi
 # ── Proton Pass CLI ───────────────────────────────────────────────────────────
 # Disable and stop the SSH agent service. Disabling prevents Restart=on-failure
 # from recreating the pass-cli database between our state wipe and our login.
-systemctl --user disable pass-cli-ssh-agent.service 2>/dev/null || true
-systemctl --user stop pass-cli-ssh-agent.service 2>/dev/null || true
+systemctl --user disable proton-pass-ssh-agent.service 2>/dev/null || true
+systemctl --user stop proton-pass-ssh-agent.service 2>/dev/null || true
 pkill -f "pass-cli" 2>/dev/null || true
 
 if [[ ! -x "$HOME/.local/bin/pass-cli" ]]; then

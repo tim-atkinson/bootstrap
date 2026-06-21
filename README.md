@@ -2,7 +2,8 @@
 
 A headless bootstrap for Debian-based machines. Authenticates with
 [Proton Pass](https://proton.me/pass) via a scoped PAT, reads a GitHub PAT
-from the vault, clones a target repository, and hands off to its `setup.sh`.
+from the vault, clones [`rybbt/dotfiles`](https://github.com/rybbt/dotfiles)
+(or any target repo), and hands off to its `setup.sh`.
 
 ## How it works
 
